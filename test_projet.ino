@@ -4,7 +4,7 @@
 const int mode1 = 13;
 const int mode2 = 12;
 const int mode3 = 11; 
-const int mode4 = 10;
+//const int mode4 = 10;
 
 //photorésistances
 const int ambient = A3;
@@ -13,12 +13,13 @@ const int rightpr = A2;
 
 //Direction & Propultion
 Servo servo;
-const int PWM_for  = 8;
-const int PWM_bac  = 7;
+const int PWM_for  = 6;
+const int PWM_bac  = 5;
 
 //Avertisseurs
-const int ledPin  = 6;
-const int speaker = 5;
+const int ledPin  = 8;
+const int led2    = 10;
+const int speaker = 7;
 
 //Ultra son
 const int TrigFront = 4;
@@ -48,9 +49,9 @@ void setup(){
   pinMode(mode1, INPUT_PULLUP);
   pinMode(mode2, INPUT_PULLUP);
   pinMode(mode3, INPUT_PULLUP);
-  pinMode(mode4, INPUT_PULLUP);
+//  pinMode(mode4, INPUT_PULLUP);
   
-  pinMode(ambient, INPUT);
+  pinMode(ambient, INPUT_PULLUP);
   pinMode(leftpr, INPUT_PULLUP);
   pinMode(rightpr, INPUT_PULLUP);
   
@@ -69,13 +70,22 @@ void setup(){
 
   pinMode(ledPin, OUTPUT);
   pinMode(speaker, OUTPUT);
+  pinMode(led2, OUTPUT);
 
-  servo.write(90);
+  servo.write(30);
   delay(500);
-  
+  //aaaaaaa
 }
 
 void loop(){
+
+    Serial.println(analogRead(ambient));
+  if(analogRead(ambient)>=120){
+    digitalWrite(led2, HIGH);
+  }
+  else{
+    digitalWrite(led2, LOW);
+  }
   //----------------------------MODE 1: Lane Keep Assist (LKA)-----------------------------
   if(digitalRead(mode1) == LOW){
     Serial.println("mode 1!");
@@ -124,7 +134,7 @@ float distancemm = measure / 2.0 * sound_speed;
 float distancecm = distancemm/10.0;
 
 
-Serial.print("Distance (cm): "); Serial.println(distancecm);
+Serial.print("mode 3 Distance (cm): "); Serial.println(distancecm);
 
 if(distancecm<=8 ){     
     
@@ -138,7 +148,7 @@ if(distancecm<=8 ){
   }  
   else{
     fin = 0;
-    analogWrite(pwmb, 255);
+    analogWrite(pwmb, 170);
     digitalWrite(ledpin, HIGH);
     delay(distancemm/2);
     digitalWrite(ledpin,LOW);
@@ -172,7 +182,7 @@ void ebs_func(int trig, int echo, int forw, int back){
 
   
   if(distancecm<10){
-    transition(1, pwma, 10, 255, 100);
+    transition(1, pwma, 70, 255, 100);
     digitalWrite(pwma,LOW);
     blink_headlights();
   }
@@ -187,18 +197,21 @@ void lka_func(Servo servo){
 
   int val1 = analogRead(A1);
   int val2 = analogRead(A2);
-  int limit = 130;
+  int limit = 200;
   
- servo.write(90);
+ servo.write(30);
  Serial.print(val1);Serial.print("  -  ");Serial.print(val2);
   if(val1>=limit){
     servo.write(50);
+    delay(100);
   }
   if(val2>=limit){
-    servo.write(15);
+    servo.write(10);
+    delay(100);
   }
   if(val2>=limit && val1>=limit){
    servo.write(30);
+   delay(100);
   }
   delay(300);
 }
